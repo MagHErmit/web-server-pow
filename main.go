@@ -71,12 +71,17 @@ func handleConnection(conn net.Conn, quotes []string) {
 		log.Printf("Error writing to connection: %v", err)
 		return
 	}
+	_, err = fmt.Fprintf(conn, "%d\n", difficulty)
+	if err != nil {
+		log.Printf("Error writing to connection: %v", err)
+		return
+	}
 	scanner := bufio.NewScanner(conn)
 	for scanner.Scan() {
 		nonce := scanner.Text()
 		if validateProofOfWork(challenge, nonce, difficulty) {
 			quote := getRandomQuote(quotes)
-			_, err := fmt.Fprintf(conn, "Quote: %s\n", quote)
+			_, err := fmt.Fprintf(conn, "%s\n", quote)
 			if err != nil {
 				log.Printf("Error writing to connection: %v", err)
 			}
