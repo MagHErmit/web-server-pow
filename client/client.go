@@ -6,18 +6,38 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/joho/godotenv"
 	"log"
 	"math/big"
 	"math/rand"
 	"net"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 )
 
 func main() {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Printf("Error loading .env file: %v", err)
+	}
+
+	addr := os.Getenv("ADDRESS")
+	if addr == "" {
+		addr = "localhost"
+	}
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Printf("Connecting to server at %s:%s", addr, port)
+
 	// connect to server
-	conn, err := net.Dial("tcp", "localhost:8080")
+	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%s", addr, port))
 	if err != nil {
 		log.Fatalln(err)
 		return

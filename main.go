@@ -21,6 +21,9 @@ var difficulty int
 func main() {
 	// load env file
 	err := godotenv.Load()
+	if err != nil {
+		log.Printf("Error loading .env file: %v", err)
+	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
