@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  server:
+    build:
+      context: .
+    image: pow-server:local
+    container_name: pow-server
+    env_file:
+      - .env
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - ./quotes:/app/quotes
+  client:
+    build:
+      context: ./client
+    image: pow-client:local
+    container_name: pow-client
+    network_mode: "host"
+    depends_on:
+      - server
