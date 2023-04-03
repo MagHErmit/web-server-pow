@@ -5,29 +5,54 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"github.com/joho/godotenv"
 	"log"
 	"math/big"
 	"math/rand"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
 
-const (
-	difficulty = 5
-	quotesFile = "quotes/quotes.txt"
-)
+var difficulty int
 
 func main() {
+	// load env file
+	err := godotenv.Load()
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	diff := os.Getenv("DIFFICULTY")
+	if diff == "" {
+		difficulty = 10
+	} else {
+		difficulty, err = strconv.Atoi(diff)
+		if err != nil {
+			log.Printf("Error parsing difficulty to int: %v", err)
+		}
+	}
+
+	quotesFile := os.Getenv("QUOTES_PATH")
+	if quotesFile == "" {
+		quotesFile = "quotes/quotes.txt"
+	}
+
+	log.Printf("Starting server on port %s with difficulty %d", port, difficulty)
+	log.Printf("Quotes file: %s", quotesFile)
+
 	quotes := loadQuotes(quotesFile)
-	ln, err := net.Listen("tcp", ":8080")
+	ln, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 	defer ln.Close()
-	fmt.Println("Listening on :8080")
+	log.Printf("Server started on :%s", port)
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
